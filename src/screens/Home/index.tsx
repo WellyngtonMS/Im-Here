@@ -1,12 +1,15 @@
 import { useState } from "react";
 import {
   Alert,
+  FlatList,
   View,
   Text,
   TextInput,
   TouchableOpacity,
 } from "react-native";
 import styles from "./styles";
+
+import { Participant } from "../../components/Participant";
 
 export function Home() {
   const [participants, setParticipants] = useState<string[]>([]);
@@ -30,6 +33,26 @@ export function Home() {
     setParticipantName("");
   }
 
+  function handleParticipantRemove(name: string) {
+    Alert.alert(
+      "Remover",
+      `Você realmente deseja remover ${name} da lista de participantes?`,
+      [
+        {
+          text: "Sim",
+          onPress: () =>
+            setParticipants((prevState) =>
+              prevState.filter((participant) => participant !== name)
+            ),
+        },
+        {
+          text: "Não",
+          style: "cancel",
+        },
+      ]
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.eventName}>Nome do Evento</Text>
@@ -49,6 +72,25 @@ export function Home() {
           <Text style={styles.buttonText}>+</Text>
         </TouchableOpacity>
       </View>
+
+      <FlatList
+        data={participants}
+        renderItem={({ item }) => (
+          <Participant
+            name={item}
+            onRemove={() => handleParticipantRemove(item)}
+            key={item}
+          />
+        )}
+        keyExtractor={(item) => item}
+        showsVerticalScrollIndicator={false}
+        ListEmptyComponent={() => (
+          <Text style={styles.listEmptyText}>
+            Ninguém chegou no evento ainda? Adicione participantes a sua lista
+            de presença.
+          </Text>
+        )}
+      />
     </View>
   );
 }
